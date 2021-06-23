@@ -1,17 +1,9 @@
-/* eslint-disable no-console */
-import { useState } from 'react';
+/* eslint-disable react/button-has-type */
+import { ButtonHTMLAttributes } from 'react';
+import '../../styles/button.scss';
 
-export function Button() {
-  const [counter, setCounter] = useState<number>(0);
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
-  function increment() {
-    setCounter(counter + 1);
-    console.log(counter);
-  }
-
-  return (
-    <button type="button" onClick={increment}>
-      {counter}
-    </button>
-  );
+export function Button(props: ButtonProps) {
+  return <button className="button" {...props} />;
 }
