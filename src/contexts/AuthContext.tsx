@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { createContext, ReactNode, useState, useEffect } from 'react';
 
 import { auth, firebase } from '../services/firebase';
@@ -11,6 +12,7 @@ type User = {
 type AuthContextType = {
   user: User | undefined;
   signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
 type AuthContextProviderProps = {
@@ -45,9 +47,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
-
     const result = await auth.signInWithPopup(provider);
-
     if (result.user) {
       const { displayName, photoURL, uid } = result.user;
 
@@ -62,8 +62,14 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       });
     }
   }
+
+  async function signOut() {
+    setUser(undefined);
+    await auth.signOut();
+  }
+
   return (
-    <AuthContext.Provider value={{ user, signInWithGoogle }}>
+    <AuthContext.Provider value={{ user, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
