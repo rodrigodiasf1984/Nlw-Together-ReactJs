@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
 /* eslint-disable no-useless-return */
@@ -7,26 +10,26 @@ import { useHistory, useParams } from 'react-router-dom';
 import { useRoom } from 'hooks/useRoom';
 import { database } from 'services/firebase';
 import { toast } from 'react-toastify';
-import { Button } from '../../components/Button';
-import { RoomCode } from '../../components/RoomCode';
+import { RoomCode } from 'components/RoomCode';
+import { Button } from 'components/Button';
 import { Question } from '../../components/Question';
-import logoImage from '../../assets/images/logo.svg';
 import deleteImg from '../../assets/images/delete.svg';
-import './styles.scss';
+import checkImg from '../../assets/images/check.svg';
+import answerImg from '../../assets/images/answer.svg';
+import { Header } from '../../components/Header';
 
 type RoomParams = {
   id: string;
 };
 
 export function AdminRoom() {
-  // const { user } = useAuth();
-  const history = useHistory();
   const params = useParams<RoomParams>();
   const roomId = params.id;
   const { questions, title } = useRoom(roomId);
+  const history = useHistory();
 
   async function handleDeleteQuestion(questionId: string) {
-    // adicionar modalde confirmação para excluir pergunta
+    // adicionar modal de confirmação para excluir pergunta
     if (window.confirm('Tem certeza que você deseja excluir esta pergunta?')) {
       const resp = await database
         .ref(`rooms/${roomId}/questions/${questionId}`)
@@ -37,7 +40,19 @@ export function AdminRoom() {
     }
   }
 
-  async function handleEndRoom() {
+  async function handleCheckQuestionAsAnswered(questionId: string) {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isAnswered: true,
+    });
+  }
+
+  async function handleHighlightQuestion(questionId: string) {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isHighlighted: true,
+    });
+  }
+
+  async function handleCloseRoom() {
     await database.ref(`rooms/${roomId}`).update({
       endedAt: new Date(),
     });
@@ -47,17 +62,14 @@ export function AdminRoom() {
 
   return (
     <div id="page-room">
-      <header>
-        <div className="content">
-          <img src={logoImage} alt="Letmeask" />
-          <div>
-            <RoomCode code={roomId} />
-            <Button isOutlined onClick={handleEndRoom}>
-              Encerrar sala
-            </Button>
-          </div>
+      <Header>
+        <div>
+          <RoomCode code={roomId} />
+          <Button isOutlined onClick={handleCloseRoom}>
+            Encerrar sala
+          </Button>
         </div>
-      </header>
+      </Header>
       <main>
         <div className="room-title">
           <h1>Sala {title}</h1>
@@ -69,7 +81,25 @@ export function AdminRoom() {
               key={question.id}
               author={question.author}
               content={question.content}
+              isAnswered={question.isAnswered}
+              isHighlighted={question.isHighlighted}
             >
+              {!question.isAnswered && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleCheckQuestionAsAnswered(question.id)}
+                  >
+                    <img src={checkImg} alt="Marcar pergunta como respondida" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleHighlightQuestion(question.id)}
+                  >
+                    <img src={answerImg} alt="Dar destaque à pergunta" />
+                  </button>
+                </>
+              )}
               <button
                 type="button"
                 onClick={() => handleDeleteQuestion(question.id)}
