@@ -9,11 +9,13 @@ import { Button } from '../../components/Button';
 import illustrationImg from '../../assets/images/illustration.svg';
 import logoImg from '../../assets/images/logo.svg';
 import './styles.scss';
+import { UserInfoLogin } from '../../components/UserInfoLogin';
 
 export function NewRoom() {
   const { user } = useAuth();
   const history = useHistory();
   const [newRoom, setNewRoom] = useState('');
+
   async function handleCreateRoom(event: FormEvent) {
     event.preventDefault();
     if (newRoom.trim() === '') {
@@ -38,6 +40,7 @@ export function NewRoom() {
       <main>
         <div className="main-content">
           <img src={logoImg} alt="Letmeask" />
+          {user && <UserInfoLogin layoutDirection="col" />}
           <h2>Criar uma nova sala</h2>
           <form onSubmit={handleCreateRoom}>
             <input
