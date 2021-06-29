@@ -22,6 +22,10 @@
     color: #835afd
   }
 
+  &.logout-button{
+    background: #ea4335;
+    margin-bottom: 8px;
+  }
   &:not(:disabled):hover{
     filter: brightness(0.9);
   }
